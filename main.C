@@ -3,7 +3,8 @@
 
 int main(){
   
-  emap my_emap ( "HOremap_Feb2015_crate7.txt");
+  emap my_emap;
+  my_emap.addFile ("HOremap_Feb2015_crate7.txt");
   
   int htr       = my_emap.getHTR      ( "P2", "S05", 4, 7 );
   int fpga      = my_emap.getFPGA     ( "P2", "S05", 4, 7 );

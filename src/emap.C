@@ -7,15 +7,11 @@
 #include <iostream>
 
 // Constructor
-emap::emap( const char * file_path ):
-  m_file_path ( file_path ),
-  m_raw_data_n_columns ( 45 ),
+emap::emap():
   m_max_hash ( 50000 ),
-  m_hash_table(new std::vector<ho_box> ( m_max_hash, ho_box()))
-{
-  getRawData(); 
-  processData();
-}
+  m_hash_table(new std::vector<ho_box> ( m_max_hash, ho_box())),
+  m_raw_data_n_columns ( 45 )
+{}
 
 emap::~emap(){
   if ( m_hash_table ) delete m_hash_table;
@@ -72,14 +68,16 @@ int emap::getFPGA( const std::string & ring, const std::string & sector, const i
   return (*m_hash_table)[box_tools::getHash ( ring, sector, rm, rm_fib )].getSide();
 }
 
+// Add a new 
 
 // Process the data from the file (from constructor)
 
-void emap::getRawData(){
-  std::ifstream file (m_file_path);
+void emap::addFile(const char* file_path){
+  std::ifstream file (file_path);
   int i_line = 0;
   std::string line, entry;
   std::vector<std::string> tmp_v;
+  std::vector<std::vector<std::string> > raw_data;
   while ( getline ( file, line ) ){
     // Clear white space from the end of the line
     tools::rtrim( line );
@@ -89,14 +87,16 @@ void emap::getRawData(){
       tmp_v.push_back ( entry ) ;
     // Only save the vector if it has the right number of entries
     if ( tmp_v.size() != m_raw_data_n_columns ) continue;
-    m_raw_data.push_back ( tmp_v );
+    raw_data.push_back ( tmp_v );
   }
+  
+  processRawData ( raw_data );
 }
 
 // Make boxes from raw data
 
-void emap::processData(){
-  const int n_all_rows = m_raw_data.size();
+ void emap::processRawData( const std::vector<std::vector<std::string> > & raw_data ){
+  const int n_all_rows = raw_data.size();
   const int n_big_rows = n_all_rows / 8;
   const int n_sides = 2; // top and bottom
   const int n_rows_per_big_row = 8;
@@ -114,7 +114,7 @@ void emap::processData(){
     
     // Loop over the slots in the big row
     for (int i_slot = 0; i_slot < n_slots_per_big_row; ++i_slot){
-      slot = std::stoi(m_raw_data[top_row][slot_starting_columns[i_slot]]);
+      slot = std::stoi(raw_data[top_row][slot_starting_columns[i_slot]]);
 
       // Loop over FPGAs in the big row (top and bottom)
       for (int i_side = 0; i_side < n_sides; ++i_side ){
@@ -128,8 +128,8 @@ void emap::processData(){
 	  if ( column   >= 16 && column   <= 20 ) continue; // Skip HOX boxes for now
 	  
 	  // Make the boxes
-	  ho_box top_box    ( m_raw_data, slot, box::TOP   , top_row   , column );
-	  ho_box bottom_box ( m_raw_data, slot, box::BOTTOM, bottom_row, column );
+	  ho_box top_box    ( raw_data, slot, box::TOP   , top_row   , column );
+	  ho_box bottom_box ( raw_data, slot, box::BOTTOM, bottom_row, column );
 
 	  // Fill the hash table
 	  (*m_hash_table)[top_box.getHash()   ] = top_box;

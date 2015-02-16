@@ -11,9 +11,12 @@ class emap {
   
  public:
 
-  // Constructor
-  emap ( const char * file_path );
+  // Constructor + destructor
+  emap ();
   ~emap();
+
+  // Build the emap
+  void addFile(const char* file_path);
   
   // Getter functions
 
@@ -29,21 +32,16 @@ class emap {
  private:
 
   // Private functions
-  void getRawData();
-  void processData();
+  void processRawData(const std::vector<std::vector<std::string> > & raw_data);
   
   // Member items
   
   // Hash table info
   const int m_max_hash;
   std::vector<ho_box> * m_hash_table;
-
-  // Input txt file path
-  const char * m_file_path;
- 
-  // Raw data
+  
+  // Raw data info
   const int m_raw_data_n_columns;
-  std::vector<std::vector<std::string> > m_raw_data;
 
 };
 
