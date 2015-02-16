@@ -4,6 +4,7 @@
 int main(){
   
   emap my_emap;
+  my_emap.addFile ("HOremap_Feb2015_crate3.txt");
   my_emap.addFile ("HOremap_Feb2015_crate7.txt");
   
   int htr       = my_emap.getHTR      ( "P2", "S05", 4, 7 );
