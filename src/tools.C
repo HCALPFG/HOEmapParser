@@ -20,3 +20,10 @@ void tools::split ( const std::string & content,
 void tools::rtrim(std::string &content){
   content.erase(std::find_if(content.rbegin(), content.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), content.end());
 }
+
+// Is a string a number?
+bool tools::is_number(const std::string& content) {
+    std::string::const_iterator it = content.begin();
+    while (it != content.end() && std::isdigit(*it)) ++it;
+    return !content.empty() && it == content.end();
+}

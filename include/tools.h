@@ -13,6 +13,9 @@ namespace tools {
   
   // Clean white space from end of line
   void rtrim (std::string &content);
+
+  // Is this string a number?
+  bool is_number(const std::string & content);
 };
 
 #endif
