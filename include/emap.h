@@ -28,6 +28,9 @@ class emap {
 
   int getFPGA    ( const int &         ring, const int &         sector, const int & rm, const int & rm_fib );
   int getFPGA    ( const std::string & ring, const std::string & sector, const int & rm, const int & rm_fib );
+
+  bool isHOX     ( const int &         ring, const int &         sector, const int & rm, const int & rm_fib );
+  bool isHOX     ( const std::string & ring, const std::string & sector, const int & rm, const int & rm_fib );
   
  private:
 
@@ -38,7 +41,7 @@ class emap {
   
   // Hash table info
   const int m_max_hash;
-  std::vector<ho_box> * m_hash_table;
+  std::vector<box> * m_hash_table;
   
   // Raw data info
   const int m_raw_data_n_columns;

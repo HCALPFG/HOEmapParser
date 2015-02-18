@@ -5,7 +5,7 @@
 #include <iostream>
 
 box::box():
-  m_slot(-1),
+  m_int_slot(-1),
   m_side(box::NONE),
   m_row(-1),
   m_column(-1),
@@ -15,9 +15,7 @@ box::box():
 {}
 
 box::box( const std::vector<std::vector<std::string> > & data, 
-	  const int& slot , const box_side & side,
-	  const int& row  , const int & column ):
-  m_slot          ( slot   ),
+	  const box_side & side, const int& row  , const int & column ):
   m_side          ( side   ),
   m_row           ( row    ),
   m_column        ( column ),

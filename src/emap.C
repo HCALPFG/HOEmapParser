@@ -9,7 +9,7 @@
 // Constructor
 emap::emap():
   m_max_hash ( 50000 ),
-  m_hash_table(new std::vector<ho_box> ( m_max_hash, ho_box())),
+  m_hash_table(new std::vector<box> ( m_max_hash, box())),
   m_raw_data_n_columns ( 45 )
 {}
 
@@ -68,6 +68,24 @@ int emap::getFPGA( const std::string & ring, const std::string & sector, const i
   return (*m_hash_table)[box_tools::getHash ( ring, sector, rm, rm_fib )].getSide();
 }
 
+
+bool emap::isHOX( const int & ring, const int & sector, const int & rm, const int & rm_fib ){
+  if ( (*m_hash_table)[box_tools::getHash ( ring, sector, rm, rm_fib )].getSide() == box::NONE ) {
+    std::cout << "ERROR: INVALID COORDINATES!"  << std::endl;
+    return -1;
+  }
+  return (*m_hash_table)[box_tools::getHash ( ring, sector, rm, rm_fib )].isHOX();
+}
+
+bool emap::isHOX( const std::string & ring, const std::string & sector, const int & rm, const int & rm_fib ){
+  if ( (*m_hash_table)[box_tools::getHash ( ring, sector, rm, rm_fib )].getSide() == box::NONE ) {
+    std::cout << "ERROR: INVALID COORDINATES!"  << std::endl;
+    return -1;
+  }
+  return (*m_hash_table)[box_tools::getHash ( ring, sector, rm, rm_fib )].isHOX();
+}
+
+
 // Add a new 
 
 // Process the data from the file (from constructor)
@@ -95,46 +113,51 @@ void emap::addFile(const char* file_path){
 
 // Make boxes from raw data
 
- void emap::processRawData( const std::vector<std::vector<std::string> > & raw_data ){
-  const int n_all_rows = raw_data.size();
-  const int n_big_rows = n_all_rows / 8;
-  const int n_sides = 2; // top and bottom
-  const int n_rows_per_big_row = 8;
-  const int n_slots_per_big_row = 4;
-  const int slot_starting_columns [n_slots_per_big_row] = { 0, 10, 25, 35 };
-  const int n_columns_per_slot = 10;
-  const int n_rows_per_box = 4;
+void emap::processRawData( const std::vector<std::vector<std::string> > & raw_data ){
 
-  int top_row, bottom_row, slot, column;
-  
-  // Loop over big rows (3 slots each)
-  for (int i_big_row = 0; i_big_row < n_big_rows; ++i_big_row ){
-    top_row    = i_big_row * n_rows_per_big_row;
-    bottom_row = top_row + n_rows_per_box;
-    
-    // Loop over the slots in the big row
-    for (int i_slot = 0; i_slot < n_slots_per_big_row; ++i_slot){
-      slot = std::stoi(raw_data[top_row][slot_starting_columns[i_slot]]);
+  const int n_small_rows_per_big_row = 4;
+  const int n_small_rows = raw_data.size();
+  const int n_big_rows = n_small_rows / n_small_rows_per_big_row;
 
-      // Loop over FPGAs in the big row (top and bottom)
-      for (int i_side = 0; i_side < n_sides; ++i_side ){
-	
-	// Loop over columns in the big row
-	for (int i_column = 0; i_column < n_columns_per_slot; ++i_column){
-	  
-	  // What is the actual column number?
-	  column = slot_starting_columns[i_slot] + i_column ;
-	  if ( i_column == 0  || i_column == 5  ) continue; // these are empty
-	  if ( column   >= 16 && column   <= 20 ) continue; // Skip HOX boxes for now
-	  
-	  // Make the boxes
-	  ho_box top_box    ( raw_data, slot, box::TOP   , top_row   , column );
-	  ho_box bottom_box ( raw_data, slot, box::BOTTOM, bottom_row, column );
+  for (int i_big_row = 0; i_big_row < n_big_rows; ++i_big_row){
+    bool is_top ( i_big_row % 2 == 0 );
+    box::box_side side = is_top ? box::TOP : box::BOTTOM;
 
-	  // Fill the hash table
-	  (*m_hash_table)[top_box.getHash()   ] = top_box;
-	  (*m_hash_table)[bottom_box.getHash()] = bottom_box;
-	}
+    // "row" refers to the top row of a 4-row "big row"
+    int row = i_big_row * n_small_rows_per_big_row;
+    int ho_slot = std::atoi(raw_data[row][0].c_str());
+    int n_columns = raw_data[row].size();
+    for (int i_column = 0; i_column < n_columns; ++i_column){
+      
+      // Skip empty columns
+      if ( raw_data[row][i_column].empty() ) continue;
+
+      // If this is a number, it describes the slot for HO boxes (not HOX boxes)
+      // Take note of the slot and then move to the next column
+      if ( tools::is_number ( raw_data[row][i_column] )) {
+	ho_slot = std::atoi ( raw_data[row][i_column].c_str() );
+	continue;
+      }
+      
+      // This is a box.  Is it an HO box or an HOX box?
+      // The third row of an HOX box has a "/" in it.
+      // The third row of an HO box does not.
+      
+      bool is_hox ( raw_data[row + 2][i_column].find('/') != std::string::npos );
+      
+      // If this is an HOX box, use the HOX class to add an entry to the hash table
+
+      if ( is_hox ) { 
+	hox_box box ( raw_data, side, row, i_column);
+	(*m_hash_table)[box.getHash()] = box;
+      }
+
+      // If this is an HO box, use the HO class to add an entry to the hash table
+
+      else { 
+	ho_box box ( raw_data, side, row, i_column);
+	box.setSlot(ho_slot);
+	(*m_hash_table)[box.getHash()] = box;
       }
     }
   }

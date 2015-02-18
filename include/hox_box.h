@@ -9,9 +9,8 @@ class hox_box : public box {
 
   // constructor 
   hox_box ( const std::vector<std::vector<std::string> > & data, 
-	    const int& slot , const box_side & side, 
-	    const int& row  , const int & column );
-
+	    const box_side & side, const int& row  , const int & column );
+  
  protected:
 
   // Member data
@@ -24,8 +23,6 @@ class hox_box : public box {
 
   // Processed integers derived from strings
   int m_int_crate;
-  int m_int_slot;
-  int m_int_htr_fbr;
 
 };
 
