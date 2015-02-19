@@ -16,7 +16,7 @@ class emap {
   ~emap();
 
   // Build the emap
-  void addFile(const char* file_path);
+  void addFile(const char* file_path, const int & crate_number);
 
   // Print the hash 
   void printHash();
@@ -38,7 +38,7 @@ class emap {
  private:
 
   // Private functions
-  void processRawData(const std::vector<std::vector<std::string> > & raw_data);
+  void processRawData(const std::vector<std::vector<std::string> > & raw_data, const int & crate_number);
   
   // Member items
   

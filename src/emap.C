@@ -90,7 +90,7 @@ bool emap::isHOX( const std::string & ring, const std::string & sector, const in
 
 // Process the data from the file (from constructor)
 
-void emap::addFile(const char* file_path){
+void emap::addFile(const char* file_path, const int & crate_number ){
   std::ifstream file (file_path);
   int i_line = 0;
   std::string line, entry;
@@ -108,12 +108,12 @@ void emap::addFile(const char* file_path){
     raw_data.push_back ( tmp_v );
   }
   
-  processRawData ( raw_data );
+  processRawData ( raw_data, crate_number );
 }
 
 // Make boxes from raw data
 
-void emap::processRawData( const std::vector<std::vector<std::string> > & raw_data ){
+void emap::processRawData( const std::vector<std::vector<std::string> > & raw_data, const int & crate_number ){
 
   const int n_small_rows_per_big_row = 4;
   const int n_small_rows = raw_data.size();
@@ -160,6 +160,7 @@ void emap::processRawData( const std::vector<std::vector<std::string> > & raw_da
       if ( is_hox ) { 
 	hox_box box ( raw_data, side, row, i_column);
 	box.setBlock (block);
+	box.setCrate (crate_number);
 	(*m_hash_table)[box.getHash()] = box;
       }
 
@@ -169,6 +170,7 @@ void emap::processRawData( const std::vector<std::vector<std::string> > & raw_da
 	ho_box box ( raw_data, side, row, i_column);
 	box.setSlot(ho_slot);
 	box.setBlock (block);
+	box.setCrate(crate_number);
 	(*m_hash_table)[box.getHash()] = box;
       }
     }
@@ -196,6 +198,7 @@ void emap::printHash(){
       << "slot = " << (*m_hash_table)[i].getSlot() << "\t"
       << "fpga = " << fpga << "\t"
       << "htr_fiber = " << (*m_hash_table)[i].getHTRFiber() << "\t" 
+      << "crate = " << (*m_hash_table)[i].getCrate() << "\t"
       << "block = " << (*m_hash_table)[i].getBlock() << "\t"
       << "coupler = " << (*m_hash_table)[i].getCoupler() << "\t"
       << "type = " << type << std::endl;

@@ -28,9 +28,11 @@ class box {
   bool     isHOX()        { return m_is_hox;         }
   int      getCoupler()   { return m_int_coupler;    } 
   int      getBlock()     { return m_int_block;      }
+  int      getCrate()     { return m_int_crate;      }
   
   // Setter functions
   void     setBlock(int b){ m_int_block = b;         }
+  void     setCrate(int c){ m_int_crate = c;         }
 
   // Hash
   int getHash();
@@ -57,6 +59,7 @@ class box {
   int m_int_rm_fib;
   int m_int_sign;
   int m_int_htr_fiber;
+  int m_int_crate;
   int m_int_block;
   int m_int_coupler;
   
