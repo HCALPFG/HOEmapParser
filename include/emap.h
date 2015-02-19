@@ -17,6 +17,9 @@ class emap {
 
   // Build the emap
   void addFile(const char* file_path);
+
+  // Print the hash 
+  void printHash();
   
   // Getter functions
 
