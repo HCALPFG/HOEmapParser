@@ -26,7 +26,12 @@ class box {
   int      getSlot()      { return m_int_slot;       }
   int      getHTRFiber()  { return m_int_htr_fiber;  }
   bool     isHOX()        { return m_is_hox;         }
+  int      getCoupler()   { return m_int_coupler;    } 
+  int      getBlock()     { return m_int_block;      }
   
+  // Setter functions
+  void     setBlock(int b){ m_int_block = b;         }
+
   // Hash
   int getHash();
 
@@ -52,6 +57,8 @@ class box {
   int m_int_rm_fib;
   int m_int_sign;
   int m_int_htr_fiber;
+  int m_int_block;
+  int m_int_coupler;
   
   // Is this HOX?
   bool m_is_hox;

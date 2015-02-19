@@ -32,9 +32,10 @@ box::box( const std::vector<std::vector<std::string> > & data,
   else if ( m_str_ring.compare ("P1" ) == 0 ) m_int_ring =  1;
   else if ( m_str_ring.compare ("P2" ) == 0 ) m_int_ring =  2;
   
-  m_int_sector = std::stoi(m_str_sector.substr( m_str_sector.find_first_of("S", 0) + 1, m_str_sector.size()));
-  m_int_rm     = std::stoi ( entries[0] );
-  m_int_rm_fib = std::stoi ( entries[1] );
+  m_int_sector  = std::stoi(m_str_sector.substr( m_str_sector.find_first_of("S", 0) + 1, m_str_sector.size()));
+  m_int_rm      = std::stoi ( entries[0] );
+  m_int_rm_fib  = std::stoi ( entries[1] );
+  m_int_coupler = (column % 5) + (((row/4)% 3) * 4);
   
 }
 
