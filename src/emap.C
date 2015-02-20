@@ -1,6 +1,8 @@
 #include "emap.h"
 #include "tools.h"
 #include "box_tools.h"
+#include "ho_box.h"
+#include "hox_box.h"
 
 #include <fstream>
 #include <sstream>
@@ -158,20 +160,22 @@ void emap::processRawData( const std::vector<std::vector<std::string> > & raw_da
       // If this is an HOX box, use the HOX class to add an entry to the hash table
 
       if ( is_hox ) { 
-	hox_box box ( raw_data, side, row, i_column);
-	box.setBlock (block);
-	box.setCrate (crate_number);
-	(*m_hash_table)[box.getHash()] = box;
+	hox_box my_box ( raw_data, side, row, i_column);
+	my_box.setBlock (block);
+	my_box.setCrate (crate_number);
+	m_map.insert(std::pair<int, box>(my_box.getHash(), my_box));
+	(*m_hash_table)[my_box.getHash()] = my_box;
       }
 
       // If this is an HO box, use the HO class to add an entry to the hash table
 
       else { 
-	ho_box box ( raw_data, side, row, i_column);
-	box.setSlot(ho_slot);
-	box.setBlock (block);
-	box.setCrate(crate_number);
-	(*m_hash_table)[box.getHash()] = box;
+	ho_box my_box ( raw_data, side, row, i_column);
+	my_box.setSlot(ho_slot);
+	my_box.setBlock (block);
+	my_box.setCrate(crate_number);
+	m_map.insert(std::pair<int, box>(my_box.getHash(), my_box));
+	(*m_hash_table)[my_box.getHash()] = my_box;
       }
     }
   }
@@ -203,6 +207,55 @@ void emap::printHash(){
       << "coupler = " << (*m_hash_table)[i].getCoupler() << "\t"
       << "type = " << type << std::endl;
     
+  }
+
+}
+
+void emap::printMap(){
+
+  it_single it1;
+  it_pair it2;
+  
+  for (int i = 0; i < m_max_hash; ++i){
+    if ( (*m_hash_table)[i].getSide() == box::NONE ) continue;
+    int hash   = i;
+    int rm_fib = (hash / 1    ) % 10;
+    int rm     = (hash / 10   ) % 10;
+    int sector = (hash / 100  ) % 100;
+    int ring   = (hash / 10000) - 2;
+
+    int n = 0;
+    it2 = m_map.equal_range(hash);
+    for (it1 = it2.first; it1 != it2.second; ++it1){
+
+
+      std::string fpga = it1 -> second.getSide() == box::TOP ? std::string("top") : std::string ("bot");
+      std::string type = it1 -> second.isHOX() ? std::string ("HOX") : std::string ("HO");
+
+
+      std::cout 
+	<< "hash = "      << hash << "\t"
+	<< "ring = "      << ring << "\t"
+	<< "sector = "    << sector << "\t"
+	<< "rm = "        << rm << "\t"
+	<< "rm_fib = "    << rm_fib << "\t"
+	<< "slot = "      << it1 -> second.getSlot() << "\t"
+	<< "fpga = "      << fpga << "\t"
+	<< "htr_fiber = " << it1 -> second.getHTRFiber() << "\t" 
+	<< "crate = "     << it1 -> second.getCrate() << "\t"
+	<< "block = "     << it1 -> second.getBlock() << "\t"
+	<< "coupler = "   << it1 -> second.getCoupler() << "\t"
+	<< "type = "      << type << "\t";
+      if ( n == 0 ) std::cout << std::endl;
+      else          std::cout << "Duplicate!" << std::endl;
+      
+      ++n;
+    }
+    
+
+    /*
+
+    */
   }
 
 }

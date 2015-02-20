@@ -1,11 +1,11 @@
 #ifndef EMAP_H
 #define EMAP_H
 
+#include <map>
 #include <vector>
 #include <string>
 
-#include "ho_box.h"
-#include "hox_box.h"
+#include "box.h"
 
 class emap { 
   
@@ -18,8 +18,9 @@ class emap {
   // Build the emap
   void addFile(const char* file_path, const int & crate_number);
 
-  // Print the hash 
+  // Print the hash / map
   void printHash();
+  void printMap ();
   
   // Getter functions
 
@@ -45,9 +46,23 @@ class emap {
   // Hash table info
   const int m_max_hash;
   std::vector<box> * m_hash_table;
+  std::vector<int> m_hashes;
+
+  // Map info
+  std::multimap<int, box> m_map;
   
   // Raw data info
   const int m_raw_data_n_columns;
+
+  //typedefs 
+ public:
+
+  typedef std::multimap<int, box>::iterator it_single;
+  typedef std::pair< it_single, it_single > it_pair;
+    
+    
+    
+  
 
 };
 
